@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Kakao 지도 시작하기</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #map {
+            margin: 0 auto;
+            width: 90%;
+            height: 300px;
+        }
+        .header, .form-row, #reserveButton {
+            margin: 10px 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            align-items: center;
+        }
+        .header .title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        .form-input {
+            display: flex;
+            flex-direction: column;
+            width: 48%; /* Adjust width here */
+        }
+        .form-input label {
+            margin-bottom: 5px;
+        }
+        .form-input input, .form-input select {
+            padding: 5px;
+        }
+        #reserveButton {
+            width: calc(100% - 60px);
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">예약하기</div>
+        <div>
+            <label for="regionSelect">이용지역: </label>
+            <select id="regionSelect">
+                <option value="dado">다도면</option>
+                <option value="munpyeong">문평면</option>
+            </select>
+        </div>
+    </div>
+    
+    <div id="map"></div>
+
+    <div class="form-row">
+        <div class="form-input">
+            <label for="startLocation">출발지:</label>
+            <input id="startLocation" type="text" placeholder="출발지를 입력하세요" readonly/>
+        </div>
+        <div class="form-input">
+            <label for="endLocation">도착지:</label>
+            <input id="endLocation" type="text" placeholder="도착지를 입력하세요" readonly/>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-input">
+            <label for="dateInput">날짜:</label>
+            <input id="dateInput" type="date"/>
+        </div>
+        <div class="form-input">
+            <label for="timeInput">시간:</label>
+            <input id="timeInput" type="time"/>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="form-row">
+        <div class="form-input">
+            <label for="nameInput">이름:</label>
+            <input id="nameInput" type="text" placeholder="이름을 입력하세요"/>
+        </div>
+        <div class="form-input">
+            <label for="phoneInput">전화번호:</label>
+            <input id="phoneInput" type="text" placeholder="전화번호를 입력하세요"/>
+        </div>
+    </div>
+
+    <button id="reserveButton">예약하기</button>
+
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=0e37ebbf79dc026ab93f431574d744f7&libraries=services"></script>
+    <script>
+    var map, geocoder, startMarker, endMarker;
+    var startLatLng, endLatLng; // 출발지와 도착지의 위도와 경도
+    var currentMarker = 'start'; // 현재 설정 중인 마커 추적 ('start' 또는 'end')
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+        getCurrentLocation(); // 페이지 로드 시 사용자의 현재 위치 정보를 가져옵니다.
+    });
+
+    function initMap() {
+        var container = document.getElementById('map');
+        var options = {
+            center: new kakao.maps.LatLng(34.962645, 126.831018), // 기본 위치
+            level: 3
+        };
+
+        map = new kakao.maps.Map(container, options);
+        geocoder = new kakao.maps.services.Geocoder();
+
+        kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+            var latlng = mouseEvent.latLng;
+            searchAddrFromCoords(latlng, displayAddress);
+        });
+    }
+
+    function searchAddrFromCoords(coords, callback) {
+        var apiURL = 'https://dapi.kakao.com/v2/local/geo/coord2address.json';
+        var queryParams = `?x=${coords.getLng()}&y=${coords.getLat()}`;
+
+        fetch(apiURL + queryParams, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'KakaoAK f3f9a175a07e0ee599828e5fe2463035'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.documents && data.documents.length > 0) {
+                callback(data.documents, kakao.maps.services.Status.OK);
+            } else {
+                console.log("No address data found.");
+                callback(null, kakao.maps.services.Status.ZERO_RESULT);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            callback(null, kakao.maps.services.Status.ERROR);
+        });
+    }
+
+    function displayAddress(result, status) {
+        if (status === kakao.maps.services.Status.OK) {
+            var address = result[0].road_address ? result[0].road_address.address_name : result[0].address.address_name;
+            if (currentMarker === 'start') {
+                document.getElementById('startLocation').value = address;
+                startLatLng = result[0].address;
+                setMarker(new kakao.maps.LatLng(startLatLng.y, startLatLng.x), true);
+            } else if (currentMarker === 'end') {
+                document.getElementById('endLocation').value = address;
+                endLatLng = result[0].address;
+                setMarker(new kakao.maps.LatLng(endLatLng.y, endLatLng.x), false);
+            }
+        }
+    }
+
+    function setMarker(position, isStart) {
+    // 기존 마커가 있으면 위치만 업데이트
+    if (isStart) {
+        if (startMarker) {
+            startMarker.setPosition(position);
+        } else {
+            startMarker = new kakao.maps.Marker({
+                map: map,
+                position: position
+            });
+        }
+    } else {
+        if (endMarker) {
+            endMarker.setPosition(position);
+        } else {
+            endMarker = new kakao.maps.Marker({
+                map: map,
+                position: position
+            });
+        }
+    }
+}
+
+function displayAddress(result, status) {
+    if (status === kakao.maps.services.Status.OK) {
+        var address = result[0].road_address ? result[0].road_address.address_name : result[0].address.address_name;
+        var latLng = new kakao.maps.LatLng(result[0].y, result[0].x);
+        
+        if (currentMarker === 'start') {
+            document.getElementById('startLocation').value = address;
+            startLatLng = latLng;
+            setMarker(startLatLng, true);
+        } else if (currentMarker === 'end') {
+            document.getElementById('endLocation').value = address;
+            endLatLng = latLng;
+            setMarker(endLatLng, false);
+        }
+    }
+}
+    function getCurrentLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var lat = position.coords.latitude; // 위도
+                var lng = position.coords.longitude; // 경도
+                            // 위도와 경도를 출발지 좌표로 설정
+            startLatLng = new kakao.maps.LatLng(lat, lng);
+
+// 출발지 마커를 설정하고 지도를 해당 위치로 이동
+setMarker(startLatLng, true);
+
+// 지도를 출발지 위치로 이동
+map.setCenter(startLatLng);
+
+// 좌표를 주소로 변환하여 출발지 텍스트 업데이트
+searchAddrFromCoords(startLatLng, function (result, status) {
+    if (status === kakao.maps.services.Status.OK) {
+        var address = result[0].road_address ? result[0].road_address.address_name : result[0].address.address_name;
+        document.getElementById('startLocation').value = address;
+    }
+});
+}, function (error) {
+console.error('Error getting current location:', error);
+});
+} else {
+console.error('Geolocation is not supported by this browser.');
+}
+}
+
+// 출발지 및 도착지 클릭 이벤트 추가
+document.getElementById('startLocation').addEventListener('click', function() {
+currentMarker = 'start';
+});
+
+document.getElementById('endLocation').addEventListener('click', function() {
+currentMarker = 'end';
+});
+
+function handleLocationError(browserHasGeolocation, pos) {
+alert(browserHasGeolocation ?
+'Error: The Geolocation service failed.' :
+'Error: Your browser doesn\'t support geolocation.');
+}
+
+
+    </script>
+
+</body>
+</html>
