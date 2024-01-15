@@ -97,7 +97,7 @@
         </div>
         <div class="form-input">
             <label for="phoneInput">전화번호:</label>
-            <input id="phoneInput" type="text" placeholder="전화번호를 입력하세요"/>
+            <input id="phoneInput" type="tel" pattern="[0-9]{3}-[0-9]{4}-[0-9]{4}" placeholder="010-1234-5678" title="전화번호 형식: 010-1234-5678"/>
         </div>
     </div>
 
@@ -110,18 +110,45 @@ function reserve() {
     var region = document.getElementById('regionSelect').value;
     var startLocation = document.getElementById('startLocation').value;
     var endLocation = document.getElementById('endLocation').value;
-    var date = document.getElementById('dateInput').value;
-    var time = document.getElementById('timeInput').value;
+    var selectedDate = document.getElementById('dateInput').value;
+    var selectedTime = document.getElementById('timeInput').value;
     var name = document.getElementById('nameInput').value;
     var phone = document.getElementById('phoneInput').value;
+
+    // 모든 필드가 채워졌는지 확인
+    if (!region || !startLocation || !endLocation || !selectedDate || !selectedTime || !name || !phone) {
+        alert("모든 내용을 작성해주세요.");
+        return; // 필드가 비어있으면 함수 실행을 중단
+    }
+
+    // 출발지와 도착지 주소의 세 번째 단어가 선택된 이용 지역인지 확인
+    var startAddressComponents = document.getElementById('startLocation').value.split(' ');
+    var endAddressComponents = document.getElementById('endLocation').value.split(' ');
+    var regionComponent = region === 'dado' ? '다도면' : '문평면';
+
+    if (startAddressComponents[2] !== regionComponent || endAddressComponents[2] !== regionComponent) {
+        alert("해당 지역을 벗어났습니다.");
+        return; // 주소가 일치하지 않으면 함수 실행을 중단
+    }
+
+    // 현재 날짜와 시간을 구함
+    var now = new Date();
+    var today = now.toISOString().substring(0, 10);
+    var currentTime = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+
+    // 선택된 날짜와 시간이 현재 날짜와 시간보다 이전인지 확인
+    if (selectedDate < today || (selectedDate === today && selectedTime < currentTime)) {
+        alert("현재 시간보다 이전 시간을 선택할 수 없습니다. 시간을 다시 선택해주세요.");
+        return; // 시간이 이전이면 함수 실행을 중단
+    }
 
     // 예약 정보를 URL 파라미터로 조합
     var reservationURL = './reservation.html' +
         '?region=' + encodeURIComponent(region) +
         '&startLocation=' + encodeURIComponent(startLocation) +
         '&endLocation=' + encodeURIComponent(endLocation) +
-        '&date=' + encodeURIComponent(date) +
-        '&time=' + encodeURIComponent(time) +
+        '&date=' + encodeURIComponent(selectedDate) +
+        '&time=' + encodeURIComponent(selectedTime) +
         '&name=' + encodeURIComponent(name) +
         '&phone=' + encodeURIComponent(phone);
 
@@ -141,6 +168,7 @@ function reserve() {
         initMap();
         getCurrentLocation(); // 페이지 로드 시 사용자의 현재 위치 정보를 가져옵니다.
     });
+
 
     function initMap() {
         var container = document.getElementById('map');
@@ -220,6 +248,7 @@ function reserve() {
         }
     }
 }
+
 
 function displayAddress(result, status) {
     if (status === kakao.maps.services.Status.OK) {
