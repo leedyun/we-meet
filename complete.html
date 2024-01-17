@@ -10,7 +10,7 @@
             padding: 0;
             color:#252525;
         }
-        .header, .form-row, #reserveButton {
+        .header, .form-row {
             margin: 10px 30px;
         }
         .reserve-info, .arrive-time, .link{
@@ -56,6 +56,7 @@
             padding: 10px;
         }
     </style>
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=41d113ed62453b8428421b6eeda76b42&libraries=services"></script>
 </head>
 
 <body>
@@ -83,6 +84,84 @@
 <!-- 경로 표시, 도착 예정 시간 표시해야함! -->
 <div class="link">경로 안내</div>
 
+<div id="map" style="width:100%;height:350px;"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // URL 파라미터에서 출발지와 도착지 정보 및 좌표 정보 가져오기
+        var params = new URLSearchParams(window.location.search);
+        var startLocation = params.get('startLocation');
+        var endLocation = params.get('endLocation');
+        
+        // 출발지와 도착지 주소를 표시
+        document.getElementById('startLocation').textContent = startLocation;
+        document.getElementById('endLocation').textContent = endLocation;
+
+        // 출발지와 도착지의 주소를 좌표로 변환하여 지도에 마커 표시
+        var geocoder = new kakao.maps.services.Geocoder();
+
+        // 출발지 주소를 좌표로 변환
+        geocoder.addressSearch(startLocation, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var startLatLng = new kakao.maps.LatLng(result[0].y, result[0].x);
+                // setMarker(startLatLng, true);
+                setMarker(startLatLng, '출발지', 'marker_green.png');
+            }
+        });
+
+        // 도착지 주소를 좌표로 변환
+        geocoder.addressSearch(endLocation, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var endLatLng = new kakao.maps.LatLng(result[0].y, result[0].x);
+                // setMarker(endLatLng, false);
+                setMarker(endLatLng, '도착지', 'marker_red.png');
+            }
+        });
+
+        var bounds = new kakao.maps.LatLngBounds();
+
+        // 마커를 지도에 표시하는 함수
+        function setMarker(position, label, image) {
+            var marker = new kakao.maps.Marker({
+                position: position, 
+                map: map,
+                label: {
+                    text: label,
+                    color: 'white',
+                    fontSize: '12px'
+                },
+                image: new kakao.maps.MarkerImage(image, new kakao.maps.Size(24, 40))
+            });
+            bounds.extend(position);
+        }
+
+        function setBounds() {
+            map.setBounds(bounds);
+        }
+    
+        // 지도 생성
+        var mapContainer = document.getElementById('map');
+        var mapOptions = {
+            level: 7
+        };
+        var regionValue = params.get('region');
+
+        // region에 따라 중심 좌표 설정
+        if (regionValue === 'dado') {
+            mapOptions.center = new kakao.maps.LatLng(34.920577, 126.830832);
+        } else if (regionValue === 'munpyeong') {
+            mapOptions.center = new kakao.maps.LatLng(35.063546, 126.615855);
+        }
+        var map = new kakao.maps.Map(mapContainer, mapOptions);
+
+    });
+    
+</script>
+
+<!-- 여기 누르면 좌표에 맞게 지도 범위 조정하려고 함 (오류로 인해 아직 구현 X) -->
+<button onclick="setBounds()">지도 범위 재설정 하기</button> 
+
+
 <!-- 이전 페이지에서 입력한 예약 정보를 가져옴 -->
     <script>
     // 이전 페이지에서 전달받은 예약 정보
@@ -109,54 +188,12 @@
     document.getElementById('time').innerText = params.get('time');
     document.getElementById('name').innerText = params.get('name');
     document.getElementById('phone').innerText = params.get('phone');
+
     </script>
 
-    <div id="map" style="width:300px;height:200px;"></div>
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c5a7e9deea09cd0526bdb58d7f2c017e&libraries=services"></script>
-
-    <script>
-    // 추가 시작
-    function loadKakaoMapScript() {
-        var script = document.createElement("script");
-        script.type = "text/javascript";
-        script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=c5a7e9deea09cd0526bdb58d7f2c017e&libraries=dmaps";
-    }
-    // 추가 끝
-
-
-    // 출발지와 도착지의 위도와 경도를 가져옴
-    var startLat = parseFloat(params.get('startLat'));
-    var startLng = parseFloat(params.get('startLng'));
-    var endLat = parseFloat(params.get('endLat'));
-    var endLng = parseFloat(params.get('endLng'));
-
-    // 지도 생성
-    var mapContainer = document.getElementById('map');
-    var mapOptions = {
-        center: new kakao.maps.LatLng((startLat + endLat) / 2, (startLng + endLng) /2),
-        level: 3
-    };
-    var map = new kakao.maps.Map(mapContainer, mapOptions);
-
-    // 출발지와 도착지의 마커 생성
-    var startMarker = new kakao.maps.Marker({
-        position: new kakao.maps.LatLng(startLat, startLng),
-        map: map
-    });
-
-    var endMarker = new kakao.maps.Marker({
-        position: new kakao.maps.LatLng(endLat, endLng),
-        map: map
-    });
-
-    // 지도 확대 레벨과 중심 위치 조정
-    var bounds = new kakao.maps.LatLngBounds();
-    bounds.extend(new kakao.maps.LatLng(startLat, startLng));
-    bounds.extend(new kakao.maps.LatLng(endLat, endLng));
-    map.setBounds(bounds);
-    </script> 
 
 <div class="arrive-time">도착 예정 시간</div> 
 
 </body>
 </html>
+

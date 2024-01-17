@@ -53,6 +53,7 @@
     </style>
 </head>
 <body>
+ 
     <div class="header">
         <div class="title">예약하기</div>
         <div>
@@ -143,7 +144,7 @@ function reserve() {
     }
 
     // 예약 정보를 URL 파라미터로 조합
-    var reservationURL = './reservation.html' +
+    var completeURL = './complete.html' +
         '?region=' + encodeURIComponent(region) +
         '&startLocation=' + encodeURIComponent(startLocation) +
         '&endLocation=' + encodeURIComponent(endLocation) +
@@ -157,9 +158,9 @@ function reserve() {
 }
 </script>
     <!-- 이영채 js key -->
-    <!-- <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=c5a7e9deea09cd0526bdb58d7f2c017e&libraries=services"></script> -->
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=41d113ed62453b8428421b6eeda76b42&libraries=services"></script>
    
-    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=0e37ebbf79dc026ab93f431574d744f7&libraries=services"></script>
+    <!-- <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=0e37ebbf79dc026ab93f431574d744f7&libraries=services"></script> -->
     <script>
     var map, geocoder, startMarker, endMarker;
     var startLatLng, endLatLng; // 출발지와 도착지의 위도와 경도
@@ -194,10 +195,10 @@ function reserve() {
         fetch(apiURL + queryParams, {
             method: 'GET',
             headers: {
-                'Authorization': 'KakaoAK f3f9a175a07e0ee599828e5fe2463035'
+                // 'Authorization': 'KakaoAK f3f9a175a07e0ee599828e5fe2463035'
                 
                 // 이영채 REST API 키
-                // "Authorization": 'KakaoAK d0c6a49c325cd9cab03af665080d6258'
+                'Authorization': 'KakaoAK e11bdcbd31500f0063091041a9a758c3'
             }
         })
         .then(response => response.json())
