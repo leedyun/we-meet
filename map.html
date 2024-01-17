@@ -156,8 +156,9 @@ function reserve() {
     window.open(reservationURL, '예약이 완료되었습니다.', 'width=500, height=800, location=no, status=no, scrollvars=yes');
 }
 </script>
- 
- 
+    <!-- 이영채 js key -->
+    <!-- <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=c5a7e9deea09cd0526bdb58d7f2c017e&libraries=services"></script> -->
+   
     <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=0e37ebbf79dc026ab93f431574d744f7&libraries=services"></script>
     <script>
     var map, geocoder, startMarker, endMarker;
@@ -194,6 +195,9 @@ function reserve() {
             method: 'GET',
             headers: {
                 'Authorization': 'KakaoAK f3f9a175a07e0ee599828e5fe2463035'
+                
+                // 이영채 REST API 키
+                // "Authorization": 'KakaoAK d0c6a49c325cd9cab03af665080d6258'
             }
         })
         .then(response => response.json())

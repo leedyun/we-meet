@@ -32,6 +32,7 @@
 
         .reservation-details p {
             margin: 0;
+            font-weight: bold;
         }
 
         .reservation-details strong {
@@ -55,14 +56,18 @@
             padding: 10px;
         }
     </style>
+</head>
 
-<div class="title">예약이 완료되었습니다!</div>
+<body>
+<div style="text-align:center; padding: 15px; background-color: rgb(241, 240, 240);" class="title">예약이 완료되었습니다!</div>
 
 <hr>
 
-<h3 style="text-align: left; font-size: 25px; padding:10px">예약 정보</h3>
+<!-- <p style="text-align: left; font-size: 25px; padding: 10px; font-weight:bold;">예약 정보</p> -->
 
 <div style="text-align:left;" class="reservation-details">
+    <p style="text-align:left; font-size:25px; ">예약 정보</p> 
+    <br>
     <p>이용지역:  <span id='region'></span></p>  
     <p>출발지:  <span id="startLocation"></span></p>
     <p>도착지:  <span id="endLocation"></span></p>
@@ -77,10 +82,9 @@
 
 <!-- 경로 표시, 도착 예정 시간 표시해야함! -->
 <div class="link">경로 안내</div>
-<div class="arrive-time">도착 예정 시간</div>
 
 <!-- 이전 페이지에서 입력한 예약 정보를 가져옴 -->
-<script>
+    <script>
     // 이전 페이지에서 전달받은 예약 정보
     var params = new URLSearchParams(window.location.search);
 
@@ -105,10 +109,54 @@
     document.getElementById('time').innerText = params.get('time');
     document.getElementById('name').innerText = params.get('name');
     document.getElementById('phone').innerText = params.get('phone');
-</script>
+    </script>
 
-</head>
-<body>
-    
+    <div id="map" style="width:300px;height:200px;"></div>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c5a7e9deea09cd0526bdb58d7f2c017e&libraries=services"></script>
+
+    <script>
+    // 추가 시작
+    function loadKakaoMapScript() {
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=c5a7e9deea09cd0526bdb58d7f2c017e&libraries=dmaps";
+    }
+    // 추가 끝
+
+
+    // 출발지와 도착지의 위도와 경도를 가져옴
+    var startLat = parseFloat(params.get('startLat'));
+    var startLng = parseFloat(params.get('startLng'));
+    var endLat = parseFloat(params.get('endLat'));
+    var endLng = parseFloat(params.get('endLng'));
+
+    // 지도 생성
+    var mapContainer = document.getElementById('map');
+    var mapOptions = {
+        center: new kakao.maps.LatLng((startLat + endLat) / 2, (startLng + endLng) /2),
+        level: 3
+    };
+    var map = new kakao.maps.Map(mapContainer, mapOptions);
+
+    // 출발지와 도착지의 마커 생성
+    var startMarker = new kakao.maps.Marker({
+        position: new kakao.maps.LatLng(startLat, startLng),
+        map: map
+    });
+
+    var endMarker = new kakao.maps.Marker({
+        position: new kakao.maps.LatLng(endLat, endLng),
+        map: map
+    });
+
+    // 지도 확대 레벨과 중심 위치 조정
+    var bounds = new kakao.maps.LatLngBounds();
+    bounds.extend(new kakao.maps.LatLng(startLat, startLng));
+    bounds.extend(new kakao.maps.LatLng(endLat, endLng));
+    map.setBounds(bounds);
+    </script> 
+
+<div class="arrive-time">도착 예정 시간</div> 
+
 </body>
 </html>
