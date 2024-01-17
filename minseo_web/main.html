@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="mainstyle.css">
+</head>
+<body>
+    <div class="container">
+        <div class="dropdown">
+            <input type="text" class="textBox" placeholder="나주시 DRT" readonly>
+            <div class="option">
+                <div onclick="show('DRT 알아보기'); showContent()"><ion-icon name="search-outline"></ion-icon>DRT 알아보기</div>
+                <div onclick="show('서비스 이용 가능 지역'); showContent()"><ion-icon name="map-outline"></ion-icon>서비스 이용 가능 지역</div>
+                <div onclick="show('DRT 예약하기')"><ion-icon name="bus-outline"></ion-icon>DRT 예약하기</div>
+            </div>
+        </div>
+        <div id="contentSection" class="contentSection">
+            DRT는 이러이러하다.
+        </div>
+    </div>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <script>
+        function show(anything) {
+            document.querySelector('.textBox').value = anything;
+        }
+
+        let dropdown = document.querySelector('.dropdown');
+        let contentSection = document.getElementById('contentSection');
+
+        function showContent() {
+            if (event.target.innerText === 'DRT 알아보기') {
+                contentSection.classList.toggle('active');
+            }
+        }
+
+        dropdown.onclick = function () {
+            dropdown.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

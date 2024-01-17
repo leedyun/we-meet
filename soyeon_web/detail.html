@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>detail - html</title>
+        <style>
+            body {
+                position: relative;
+                margin: 0;
+                font-family: Arial, sans-serif;
+            }
+
+            h1, ul {
+                z-index: 2;
+            }
+
+            h2, h3 {
+                color: black;
+            }
+
+            img {
+                width: 100%;
+                height: auto;
+                position: relative;
+                z-index: 1;
+            }
+
+            p {
+                color: black;
+                text-align: justify;
+            }
+
+            .menu-icon {
+                display: none;
+                cursor: pointer;
+            }
+
+            ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+                background-color: #333;
+                overflow: hidden;
+            }
+
+            li {
+                display: inline-block; /* float: left; 대신에 이렇게 변경 */
+            }   
+
+            li a {
+                display: block;
+                color: white;
+                text-align: center;
+                padding: 14px 16px;
+                text-decoration: none;
+            }
+
+            .dropdown {
+                display: none;
+                position: absolute;
+                background-color: #f9f9f9;
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+                z-index: 1;
+                width: 100%;
+            }
+
+            .dropdown-content {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .dropdown a {
+                color: black;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+                text-align: left;
+            }
+
+            h1 a {
+                color: black; /* 나주 DRT 링크의 색상 */
+                text-decoration: none;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+
+        <ul class="dropdown">
+            <li><a href="main.html">나주 DRT</a></li>
+            <li><a href="detail.html">DRT 알아보기</a></li>
+            <li><a href="map.html">서비스 이용 가능 지역</a></li>
+            <li><a href="#">DRT 예약하기</a></li>
+        </ul>
+
+        <h1><a href="main.html">나주 DRT</a></h1>
+        <ul>
+            <li><a href="detail.html">DRT 알아보기</a></li>
+            <li><a href="map.html">서비스 이용 가능 지역</a></li>
+            <li><a href="#">DRT 예약하기</a></li>
+        </ul>
+
+        <h2>DRT란?</h2>
+        <p>수요가 거의 없지만 반드시 버스 등 대중교통이 운행되어야 하는 지역에 적합한, 벽지노선을 대체하는 새로운 운행체계이다.</p>
+
+        
+        <h3>DRT를 이용함으로써 아래와 같은 고질적인 문제점을 해결할 수 있다.</h3>
+
+        <ol>
+            <li>1.지역 주민들의 이동성 및 접근성 향상</li><br>
+            <li>2.대중교통 서비스의 안정적인 공급</li><br>
+            <li>3.버스 업계의 경영난 해소</li><br>
+        </ol>
+        
+        
+        <img src="DRT사진.jpg" alt="DRT 이미지">
+
+        <script>
+            function toggleMenu() {
+                const dropdown = document.querySelector('.dropdown');
+                dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
+            }
+        </script>
+    </body>
+</html>

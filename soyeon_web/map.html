@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>map - html</title>
+        <style>
+            body {
+                position: relative;
+                margin: 0;
+                font-family: Arial, sans-serif;
+            }
+
+            h1, ul {
+                z-index: 2;
+            }
+
+            h2, h3 {
+                color: black;
+            }
+
+            img {
+                width: 50%;
+                height: auto;
+                position: relative;
+                z-index: 1;
+            }
+
+            p {
+                color: black;
+                text-align: justify;
+            }
+
+            .menu-icon {
+                display: none;
+                cursor: pointer;
+            }
+
+            ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+                background-color: #333;
+                overflow: hidden;
+            }
+
+            li {
+                display: inline-block; /* float: left; 대신에 이렇게 변경 */
+            }   
+
+            li a {
+                display: block;
+                color: white;
+                text-align: center;
+                padding: 14px 16px;
+                text-decoration: none;
+            }
+
+            .dropdown {
+                display: none;
+                position: absolute;
+                background-color: #f9f9f9;
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+                z-index: 1;
+                width: 100%;
+            }
+
+            .dropdown-content {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .dropdown a {
+                color: black;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+                text-align: left;
+            }
+
+            h1 a {
+                color: black; /* 나주 DRT 링크의 색상 */
+                text-decoration: none;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+
+        <ul class="dropdown">
+            <li><a href="main.html">나주 DRT</a></li>
+            <li><a href="detail.html">DRT 알아보기</a></li>
+            <li><a href="map.html">서비스 이용 가능 지역</a></li>
+            <li><a href="#">DRT 예약하기</a></li>
+        </ul>
+
+        <h1><a href="main.html">나주 DRT</a></h1>
+        <ul>
+            <li><a href="detail.html">DRT 알아보기</a></li>
+            <li><a href="map.html">서비스 이용 가능 지역</a></li>
+            <li><a href="#">DRT 예약하기</a></li>
+        </ul>
+    </head>
+
+        <h2>나주 DRT 운행 지역<br></h2>
+        <h3><li>● 문평면</li></h3>
+        <img src="문평면.PNG" width="50%">
+        <h3><li>● 다도면</li></h3>
+        <img src="다도면.PNG" width="50%">
+        
+    </body>
+</html>
