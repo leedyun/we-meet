@@ -105,7 +105,7 @@
             if (status === kakao.maps.services.Status.OK) {
                 var startLatLng = new kakao.maps.LatLng(result[0].y, result[0].x);
                 // setMarker(startLatLng, true);
-                setMarker(startLatLng, '출발지', 'marker_green.png');
+                setMarker(startLatLng, '출발지', 'marker_blue_start.png');
             }
         });
 
@@ -114,11 +114,11 @@
             if (status === kakao.maps.services.Status.OK) {
                 var endLatLng = new kakao.maps.LatLng(result[0].y, result[0].x);
                 // setMarker(endLatLng, false);
-                setMarker(endLatLng, '도착지', 'marker_red.png');
+                setMarker(endLatLng, '도착지', 'marker_red_end.png');
             }
         });
 
-        var bounds = new kakao.maps.LatLngBounds();
+        bounds = new kakao.maps.LatLngBounds();
 
         // 마커를 지도에 표시하는 함수
         function setMarker(position, label, image) {
@@ -148,18 +148,18 @@
 
         // region에 따라 중심 좌표 설정
         if (regionValue === 'dado') {
-            mapOptions.center = new kakao.maps.LatLng(34.920577, 126.830832);
+            mapOptions.center = new kakao.maps.LatLng(34.962816, 126.830903);
         } else if (regionValue === 'munpyeong') {
             mapOptions.center = new kakao.maps.LatLng(35.063546, 126.615855);
         }
         var map = new kakao.maps.Map(mapContainer, mapOptions);
 
     });
-    
-</script>
 
-<!-- 여기 누르면 좌표에 맞게 지도 범위 조정하려고 함 (오류로 인해 아직 구현 X) -->
+</script>
+<!-- 버튼 누르면 출발지/도착지 마커가 모두 보이도록 범위 재설정돼야 하는데 구현이 안됨. 삭제예정 -->
 <button onclick="setBounds()">지도 범위 재설정 하기</button> 
+
 
 
 <!-- 이전 페이지에서 입력한 예약 정보를 가져옴 -->
@@ -192,7 +192,7 @@
     </script>
 
 
-<div class="arrive-time">도착 예정 시간</div> 
+<div class="arrive-time">소요 시간</div>
 
 </body>
 </html>
