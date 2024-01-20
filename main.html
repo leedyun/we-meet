@@ -75,31 +75,32 @@
 
 .content h2 {
     position: absolute;
-    left: 50%;
+    left: 40%;
     transform: translateX(-50%);
-    top: 10%; /* 위치 조정 */
+    top: 0%; /* 위치 조정 */
     width : 100%;
     font-size: 40px;
     color: black;
-    text-align: center;
+    text-align: right;
     z-index: 2;
 }
 
 /* "예약하기" 버튼 스타일 수정 */
 .content div {
     position: absolute;
-    left: 50%;
+    left: 78%;
     transform: translateX(-50%);
-    top: 65%; /* 위치 조정 */
+    top: 20%; /* 위치 조정 */
     font-size: 20px;
     margin-top: 20px; /* 여백 추가 */
     color: black;
     text-align: center;
     cursor: pointer;
     z-index: 2;
-    background-color:#333;
-    color : white;
-    padding: 15px;
+    color : black;
+    background-color: #c3d0d8;
+    padding: 5px;
+    width:20%;
 }
 
 .content img {
@@ -109,8 +110,6 @@
     position: absolute;
     z-index: 1; /* 텍스트보다 낮은 z-index */
 }
-
-
 
 
 @media screen and (max-width: 768px) {
@@ -136,8 +135,8 @@
     </div>
 
     <div class="content">
-        <h2>어디서나 편리한 이동</h2>
-        <img src="drt_img.png" alt="DRT 이미지">
+        <h2>어디서나 <br>편리한 이동</h2>
+        <img src="drt_home.png" alt="DRT 이미지">
         <div onclick="location.href='reservation.html'">예약하기</div>
     </div>
 
