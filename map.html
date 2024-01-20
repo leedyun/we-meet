@@ -166,12 +166,6 @@ function reserve() {
     var startLatLng, endLatLng; // 출발지와 도착지의 위도와 경도
     var currentMarker = 'start'; // 현재 설정 중인 마커 추적 ('start' 또는 'end')
 
-    document.addEventListener('DOMContentLoaded', function() {
-        initMap();
-        getCurrentLocation(); // 페이지 로드 시 사용자의 현재 위치 정보를 가져옵니다.
-    });
-
-
     function initMap() {
         var container = document.getElementById('map');
         var options = {
@@ -182,10 +176,44 @@ function reserve() {
         map = new kakao.maps.Map(container, options);
         geocoder = new kakao.maps.services.Geocoder();
 
-        kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
-            var latlng = mouseEvent.latLng;
-            searchAddrFromCoords(latlng, displayAddress);
+        // 초기 마커 생성
+        var defaultLatLng = new kakao.maps.LatLng(34.962645, 126.831018);
+        createMarker(defaultLatLng, true); // 시작 위치 마커
+        createMarker(defaultLatLng, false); // 종료 위치 마커
+
+        kakao.maps.event.addListener(map, 'click', handleMapClick);
+    }
+
+    function createMarker(position, isStart) {
+        var markerImageSrc = isStart ? 'marker_blue_start.PNG' : 'marker_red_end.PNG';
+        var markerImageSize = new kakao.maps.Size(24, 35);
+        var markerImageOptions = { offset: new kakao.maps.Point(12, 35) };
+        var markerImage = new kakao.maps.MarkerImage(markerImageSrc, markerImageSize, markerImageOptions);
+
+        var marker = new kakao.maps.Marker({
+            map: map,
+            position: position,
+            image: markerImage
         });
+
+        if (isStart) {
+            startMarker = marker;
+        } else {
+            endMarker = marker;
+        }
+    }
+
+    function handleMapClick(mouseEvent) {
+        var latlng = mouseEvent.latLng;
+        setMarker(latlng, currentMarker === 'start');
+        searchAddrFromCoords(latlng, displayAddress);
+    }
+
+    function setMarker(position, isStart) {
+        var targetMarker = isStart ? startMarker : endMarker;
+        if (targetMarker) {
+            targetMarker.setPosition(position);
+        }
     }
 
     function searchAddrFromCoords(coords, callback) {
@@ -216,45 +244,6 @@ function reserve() {
         });
     }
 
-    function displayAddress(result, status) {
-        if (status === kakao.maps.services.Status.OK) {
-            var address = result[0].road_address ? result[0].road_address.address_name : result[0].address.address_name;
-            if (currentMarker === 'start') {
-                document.getElementById('startLocation').value = address;
-                startLatLng = result[0].address;
-                setMarker(new kakao.maps.LatLng(startLatLng.y, startLatLng.x), true);
-            } else if (currentMarker === 'end') {
-                document.getElementById('endLocation').value = address;
-                endLatLng = result[0].address;
-                setMarker(new kakao.maps.LatLng(endLatLng.y, endLatLng.x), false);
-            }
-        }
-    }
-
-    function setMarker(position, isStart) {
-    // 기존 마커가 있으면 위치만 업데이트
-    if (isStart) {
-        if (startMarker) {
-            startMarker.setPosition(position);
-        } else {
-            startMarker = new kakao.maps.Marker({
-                map: map,
-                position: position
-            });
-        }
-    } else {
-        if (endMarker) {
-            endMarker.setPosition(position);
-        } else {
-            endMarker = new kakao.maps.Marker({
-                map: map,
-                position: position
-            });
-        }
-    }
-}
-
-
 function displayAddress(result, status) {
     if (status === kakao.maps.services.Status.OK) {
         var address = result[0].road_address ? result[0].road_address.address_name : result[0].address.address_name;
@@ -262,59 +251,65 @@ function displayAddress(result, status) {
         
         if (currentMarker === 'start') {
             document.getElementById('startLocation').value = address;
-            startLatLng = latLng;
-            setMarker(startLatLng, true);
         } else if (currentMarker === 'end') {
             document.getElementById('endLocation').value = address;
-            endLatLng = latLng;
-            setMarker(endLatLng, false);
         }
     }
 }
-    function getCurrentLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-                var lat = position.coords.latitude; // 위도
-                var lng = position.coords.longitude; // 경도
-                            // 위도와 경도를 출발지 좌표로 설정
+function getCurrentLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            var lat = position.coords.latitude; // 위도
+            var lng = position.coords.longitude; // 경도
+
+            // 위도와 경도를 출발지 좌표로 설정
             startLatLng = new kakao.maps.LatLng(lat, lng);
 
-// 출발지 마커를 설정하고 지도를 해당 위치로 이동
-setMarker(startLatLng, true);
+            // 출발지 마커를 설정하고 지도를 해당 위치로 이동
+            setMarker(startLatLng, true);
+            map.setCenter(startLatLng);
 
-// 지도를 출발지 위치로 이동
-map.setCenter(startLatLng);
-
-// 좌표를 주소로 변환하여 출발지 텍스트 업데이트
-searchAddrFromCoords(startLatLng, function (result, status) {
-    if (status === kakao.maps.services.Status.OK) {
-        var address = result[0].road_address ? result[0].road_address.address_name : result[0].address.address_name;
-        document.getElementById('startLocation').value = address;
+            // 좌표를 주소로 변환하여 출발지 텍스트 업데이트
+            searchAddrFromCoords(startLatLng, function (result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    var address = result[0].road_address ? result[0].road_address.address_name : result[0].address.address_name;
+                    document.getElementById('startLocation').value = address;
+                }
+            });
+        }, function (error) {
+            console.error('Error getting current location:', error);
+            handleLocationError(false);
+        });
+    } else {
+        console.error('Geolocation is not supported by this browser.');
+        handleLocationError(true);
     }
-});
-}, function (error) {
-console.error('Error getting current location:', error);
-});
-} else {
-console.error('Geolocation is not supported by this browser.');
-}
 }
 
-// 출발지 및 도착지 클릭 이벤트 추가
-document.getElementById('startLocation').addEventListener('click', function() {
-currentMarker = 'start';
-});
-
-document.getElementById('endLocation').addEventListener('click', function() {
-currentMarker = 'end';
-});
-
-function handleLocationError(browserHasGeolocation, pos) {
-alert(browserHasGeolocation ?
-'Error: The Geolocation service failed.' :
-'Error: Your browser doesn\'t support geolocation.');
+function handleLocationError(browserHasGeolocation) {
+    if (!browserHasGeolocation) {
+        // 사용자가 위치 정보 제공을 거부한 경우 기본 위치로 지도 이동
+        var defaultLatLng = new kakao.maps.LatLng(34.962645, 126.831018);
+        map.setCenter(defaultLatLng);
+    } else {
+        alert('Error: Your browser doesn\'t support geolocation.');
+    }
 }
 
+// 문서 로드 시 지도 초기화
+document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+        getCurrentLocation();
+    });
+
+    // 출발지 및 도착지 입력란 클릭 이벤트 추가
+    document.getElementById('startLocation').addEventListener('click', function() {
+        currentMarker = 'start';
+    });
+
+    document.getElementById('endLocation').addEventListener('click', function() {
+        currentMarker = 'end';
+    });
 
     </script>
 
