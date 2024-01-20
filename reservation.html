@@ -12,16 +12,16 @@
         }
         #map {
             margin: 0 auto;
-            width: 90%;
+            width: 95%;
             height: 300px;
         }
         .header, .form-row, #reserveButton {
-            margin: 10px 30px;
+            margin: 5px 30px;
         }
         .header {
             display: flex;
             justify-content: space-between;
-            padding: 10px;
+            padding: 5px;
             align-items: center;
         }
         .header .title {
@@ -45,8 +45,9 @@
         }
         #reserveButton {
             width: calc(100% - 60px);
-            padding: 10px;
-            background-color: black;
+            margin-top: 40px;
+            padding: 15px;
+            background-color: #333;
             color: white;
             border: none;
             cursor: pointer;
@@ -93,7 +94,7 @@
 
         .dropdown.active {
             display: block; /* 활성화되었을 때 보이도록 설정 */
-            top : 70px;
+            top : 53px;
         }
 
         .dropdown li a {
@@ -122,7 +123,7 @@
 <body>
     
     <div class="navbar">
-        <h1 class="navbar-title"><a href="main.html">나주시 DRT</a></h1>
+        <h3 class="navbar-title"><a href="main.html">나주시 DRT</a></h3>
         <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
         <ul class="dropdown">
             <li><a href="detail.html">DRT 알아보기</a></li>
