@@ -53,7 +53,7 @@
 
         .dropdown.active {
     display: block; /* 활성화되었을 때 보이도록 설정 */
-    top : 70px;
+    top : 53px;
 }
 
         .dropdown li a {
@@ -77,7 +77,8 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: 20%; /* 위치 조정 */
+    top: 10%; /* 위치 조정 */
+    width : 100%;
     font-size: 40px;
     color: black;
     text-align: center;
@@ -85,18 +86,20 @@
 }
 
 /* "예약하기" 버튼 스타일 수정 */
-.content p {
+.content div {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: 45%; /* 위치 조정 */
-    font-size: 30px;
+    top: 65%; /* 위치 조정 */
+    font-size: 20px;
     margin-top: 20px; /* 여백 추가 */
     color: black;
     text-align: center;
     cursor: pointer;
-    font-weight: bold;
     z-index: 2;
+    background-color:#333;
+    color : white;
+    padding: 15px;
 }
 
 .content img {
@@ -123,7 +126,7 @@
 </head>
 <body>
     <div class="navbar">
-        <h1 class="navbar-title"><a href="main.html">나주시 DRT</a></h1>
+        <h3 class="navbar-title"><a href="main.html">나주시 DRT</a></h3>
         <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
         <ul class="dropdown">
             <li><a href="detail.html">DRT 알아보기</a></li>
@@ -133,9 +136,9 @@
     </div>
 
     <div class="content">
-        <h2>어디서나<br>편리한 이동</h2>
-        <img src="DRT사진.jpg" alt="DRT 이미지">
-        <p onclick="location.href='reservation.html'">예약하기 ></p>
+        <h2>어디서나 편리한 이동</h2>
+        <img src="drt_car.png" alt="DRT 이미지">
+        <div onclick="location.href='reservation.html'">예약하기</div>
     </div>
 
     <script>
