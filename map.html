@@ -81,11 +81,11 @@
     <div class="form-row">
         <div class="form-input">
             <label for="dateInput">날짜:</label>
-            <input id="dateInput" type="date"/>
+            <input id="dateInput" type="date" onchange="updateTimeOptions()"/>
         </div>
         <div class="form-input">
             <label for="timeInput">시간:</label>
-            <input id="timeInput" type="time"/>
+            <select id="timeInput"></select>
         </div>
     </div>
 
@@ -106,6 +106,37 @@
 <button id="reserveButton" onclick="reserve()">예약하기</button>
 
 <script> 
+function createTimeOptions() {
+        var timeInput = document.getElementById('timeInput');
+        for (var i = 0; i < 24; i++) {
+            var optionText = `${i}시 ~ ${i+1}시`;
+            var optionValue = `${i < 10 ? '0' + i : i}:00`;
+            var option = document.createElement('option');
+            option.textContent = optionText;
+            option.value = optionValue;
+            timeInput.appendChild(option);
+        }
+    }
+
+    function updateTimeOptions() {
+        var dateInput = document.getElementById('dateInput').value;
+        var timeInput = document.getElementById('timeInput');
+        var selectedDate = new Date(dateInput);
+        var currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+
+        for (var i = 0; i < timeInput.options.length; i++) {
+            var hour = parseInt(timeInput.options[i].value.substring(0, 2));
+            timeInput.options[i].disabled = selectedDate.getTime() === currentDate.getTime() && hour <= currentDate.getHours();
+        }
+    }
+
+    // 페이지 로드 시 실행
+    document.addEventListener('DOMContentLoaded', function() {
+        createTimeOptions();
+        updateTimeOptions();
+    });
+
 function reserve() {
     // 사용자가 입력한 정보 가져오기
     var region = document.getElementById('regionSelect').value;
