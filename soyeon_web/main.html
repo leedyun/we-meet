@@ -6,85 +6,56 @@
     <title>나주시 DRT</title>
     <style>
         body {
-            position: relative;
             margin: 0;
             font-family: Arial, sans-serif;
+            overflow: hidden; /* 스크롤바 숨기기 */
         }
 
-        h1, ul {
-            z-index: 2;
-        }
-
-        h2 {
-            position: absolute;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: black;
-            text-align: center;
-            font-size: 40px;
-            z-index: 3;
-        }
-
-        img {
-            width: 100%;
-            height: auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        p {
-            position: absolute;
-            top: 55%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: black;
-            text-align: center;
-            font-size: 30px;
-            z-index: 3;
-            cursor: pointer;
-        }
-
-        .menu-icon {
-            display: none;
-            cursor: pointer;
-        }
-
-        ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
+        .navbar {
             background-color: #333;
             overflow: hidden;
         }
 
-        li {
+        .navbar-title {
             float: left;
+            margin: 0;
+            padding: 14px 16px;
         }
 
-        li a {
-            display: block;
+        .navbar-title a {
             color: white;
-            text-align: center;
-            padding: 14px 16px;
             text-decoration: none;
         }
 
+        .menu-icon {
+            float: right;
+            padding: 14px 16px;
+            cursor: pointer;
+            color: white;
+            display: none; /* 반응형을 위해 모바일에서만 표시 */
+        }
+
         .dropdown {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-            width: 100%;
-        }
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: none;
+    position: absolute;
+    left: 0; /* 왼쪽 정렬 */
+    right: 0; /* 오른쪽 정렬 */
+    background-color: #f9f9f9;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 3; /* 이미지보다 높은 z-index 설정 */
+    overflow: hidden;
+    transition: max-height 0.5s ease-in;
+}
 
-        .dropdown-content {
-            display: flex;
-            flex-direction: column;
-        }
+        .dropdown.active {
+    display: block; /* 활성화되었을 때 보이도록 설정 */
+    top : 70px;
+}
 
-        .dropdown a {
+        .dropdown li a {
             color: black;
             padding: 12px 16px;
             text-decoration: none;
@@ -92,48 +63,93 @@
             text-align: left;
         }
 
-        h1 a {
-            color: black; /* 나주 DRT 링크의 색상 */
-            text-decoration: none;
+        .dropdown li :hover {
+            background-color : lightgrey;
         }
 
+.content {
+    position: relative;
+    height: 100vh; /* 화면 높이에 맞춤 */
+}
+
+.content h2 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 20%; /* 위치 조정 */
+    font-size: 40px;
+    color: black;
+    text-align: center;
+    z-index: 2;
+}
+
+/* "예약하기" 버튼 스타일 수정 */
+.content p {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 45%; /* 위치 조정 */
+    font-size: 30px;
+    margin-top: 20px; /* 여백 추가 */
+    color: black;
+    text-align: center;
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 2;
+}
+
+.content img {
+    top: 0;
+    width: 100%; /* 이미지 너비를 화면에 맞춤 */
+    height: 100%; /* 이미지 높이 화면에 맞춤 */
+    position: absolute;
+    z-index: 1; /* 텍스트보다 낮은 z-index */
+}
+
+
+
+
+@media screen and (max-width: 768px) {
+    .menu-icon {
+        display: block;
+    }
+
+    .dropdown {
+        display: none;
+    }
+}
     </style>
 </head>
 <body>
+    <div class="navbar">
+        <h1 class="navbar-title"><a href="main.html">나주시 DRT</a></h1>
+        <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+        <ul class="dropdown">
+            <li><a href="detail.html">DRT 알아보기</a></li>
+            <li><a href="map.html">서비스 이용 가능 지역</a></li>
+            <li><a href="../map.html">DRT 예약하기</a></li>
+        </ul>
+    </div>
 
-<div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+    <div class="content">
+        <h2>어디서나<br>편리한 이동</h2>
+        <img src="DRT사진.jpg" alt="DRT 이미지">
+        <p onclick="location.href='../map.html'">예약하기 ></p>
+    </div>
 
-<ul class="dropdown">
-    <li><a href="main.html">나주시 DRT</a></li>
-    <li><a href="detail.html">DRT 알아보기</a></li>
-    <li><a href="map.html">서비스 이용 가능 지역</a></li>
-    <li><a href="../map.html">DRT 예약하기</a></li>
-</ul>
-
-<h1><a href="main.html">나주시 DRT</a></h1>
-<ul>
-    <li><a href="detail.html">DRT 알아보기</a></li>
-    <li><a href="map.html">서비스 이용 가능 지역</a></li>
-    <li><a href="../map.html">DRT 예약하기</a></li>
-</ul>
-
-<h2>어디서나<br>편리한 이동</h2>
-<img src="DRT사진.jpg" alt="DRT 이미지">
-<p style="font-weight: bold;", onclick="location.href='../map.html'">예약하기 > </p>
-
-<script>
-    function toggleMenu() {
-        const dropdown = document.querySelector('.dropdown');
-        dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
-    }
-
-    window.addEventListener('resize', function () {
-        const dropdown = document.querySelector('.dropdown');
-        if (window.innerWidth > 768) {
-            dropdown.style.display = 'none';
+    <script>
+        function toggleMenu() {
+            const dropdown = document.querySelector('.dropdown');
+            dropdown.classList.toggle('active');
         }
-    });
-</script>
 
+        window.addEventListener('resize', function () {
+            const dropdown = document.querySelector('.dropdown');
+            if (window.innerWidth > 768) {
+                dropdown.style.display = 'none';
+            }   
+        });
+
+    </script>
 </body>
 </html>
