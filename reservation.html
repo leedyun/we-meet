@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- 예약하기 페이지 -->
+    <meta charset="utf-8"/>
+    <title>DRT 예약하기</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #map {
+            margin: 0 auto;
+            width: 90%;
+            height: 300px;
+        }
+        .header, .form-row, #reserveButton {
+            margin: 10px 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            align-items: center;
+        }
+        .header .title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        .form-input {
+            display: flex;
+            flex-direction: column;
+            width: 48%; /* Adjust width here */
+        }
+        .form-input label {
+            margin-bottom: 5px;
+        }
+        .form-input input, .form-input select {
+            padding: 5px;
+        }
+        #reserveButton {
+            width: calc(100% - 60px);
+            padding: 10px;
+            background-color: black;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .navbar {
+            background-color: #333;
+            overflow:hidden;
+        }
+
+        .navbar-title {
+            float: left;
+            margin: 0;
+            padding: 14px 16px;
+        }
+
+        .navbar-title a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .menu-icon {
+            float: right;
+            padding: 14px 16px;
+            cursor: pointer;
+            color: white;
+            display: none; /* 반응형을 위해 모바일에서만 표시 */
+        }
+
+        .dropdown {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: none;
+            position: absolute;
+            left: 0; /* 왼쪽 정렬 */
+            right: 0; /* 오른쪽 정렬 */
+            background-color: #f9f9f9;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 3; /* 이미지보다 높은 z-index 설정 */
+            overflow: hidden;
+            transition: max-height 0.5s ease-in;
+        }
+
+        .dropdown.active {
+            display: block; /* 활성화되었을 때 보이도록 설정 */
+            top : 70px;
+        }
+
+        .dropdown li a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+
+        .dropdown li :hover {
+            background-color : lightgrey;
+        }
+
+        @media screen and (max-width: 768px) {
+            .menu-icon {
+                display: block;
+            }
+
+            .dropdown {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="navbar">
+        <h1 class="navbar-title"><a href="main.html">나주시 DRT</a></h1>
+        <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+        <ul class="dropdown">
+            <li><a href="detail.html">DRT 알아보기</a></li>
+            <li><a href="map.html">서비스 이용 가능 지역</a></li>
+            <li><a href="reservation.html">DRT 예약하기</a></li>
+        </ul>
+    </div>
+
+    <div class="header">
+        <div class="title">예약하기</div>
+        <div>
+            <label for="regionSelect">이용지역: </label>
+            <select id="regionSelect">
+                <option value="dado">다도면</option>
+                <option value="munpyeong">문평면</option>
+            </select>
+        </div>
+    </div>
+    
+    <div id="map"></div>
+
+    <div class="form-row">
+        <div class="form-input">
+            <label for="startLocation">출발지:</label>
+            <input id="startLocation" type="text" placeholder="출발지를 입력하세요" readonly/>
+        </div>
+        <div class="form-input">
+            <label for="endLocation">도착지:</label>
+            <input id="endLocation" type="text" placeholder="도착지를 입력하세요" readonly/>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-input">
+            <label for="dateInput">날짜:</label>
+            <input id="dateInput" type="date" onchange="updateTimeOptions()"/>
+        </div>
+        <div class="form-input">
+            <label for="timeInput">시간:</label>
+            <select id="timeInput"></select>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="form-row">
+        <div class="form-input">
+            <label for="nameInput">이름:</label>
+            <input id="nameInput" type="text" placeholder="이름을 입력하세요"/>
+        </div>
+        <div class="form-input">
+            <label for="phoneInput">전화번호:</label>
+            <input id="phoneInput" type="tel" pattern="[0-9]{3}-[0-9]{4}-[0-9]{4}" placeholder="010-1234-5678" title="전화번호 형식: 010-1234-5678"/>
+        </div>
+    </div>
+
+<!-- 예약하기 버튼 누르면 예약 완료 팝업창 열림 -->
+<button id="reserveButton" onclick="reserve()">예약하기</button>
+
+<script> 
+
+function toggleMenu() {
+            const dropdown = document.querySelector('.dropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        window.addEventListener('resize', function () {
+            const dropdown = document.querySelector('.dropdown');
+            if (window.innerWidth > 768) {
+                dropdown.style.display = 'none';
+            }   
+        });
+        
+function createTimeOptions() {
+        var timeInput = document.getElementById('timeInput');
+        for (var i = 0; i < 24; i++) {
+            var optionText = `${i}시 ~ ${i+1}시`;
+            var optionValue = `${i < 10 ? '0' + i : i}:00`;
+            var option = document.createElement('option');
+            option.textContent = optionText;
+            option.value = optionValue;
+            timeInput.appendChild(option);
+        }
+    }
+
+    function updateTimeOptions() {
+        var dateInput = document.getElementById('dateInput').value;
+        var timeInput = document.getElementById('timeInput');
+        var selectedDate = new Date(dateInput);
+        var currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+
+        for (var i = 0; i < timeInput.options.length; i++) {
+            var hour = parseInt(timeInput.options[i].value.substring(0, 2));
+            timeInput.options[i].disabled = selectedDate.getTime() === currentDate.getTime() && hour <= currentDate.getHours();
+        }
+    }
+
+    // 페이지 로드 시 실행
+    document.addEventListener('DOMContentLoaded', function() {
+        createTimeOptions();
+        updateTimeOptions();
+    });
+
+function reserve() {
+    // 사용자가 입력한 정보 가져오기
+    var region = document.getElementById('regionSelect').value;
+    var startLocation = document.getElementById('startLocation').value;
+    var endLocation = document.getElementById('endLocation').value;
+    var selectedDate = document.getElementById('dateInput').value;
+    var selectedTime = document.getElementById('timeInput').value;
+    var name = document.getElementById('nameInput').value;
+    var phone = document.getElementById('phoneInput').value;
+
+    // 모든 필드가 채워졌는지 확인
+    if (!region || !startLocation || !endLocation || !selectedDate || !selectedTime || !name || !phone) {
+        alert("모든 내용을 작성해주세요.");
+        return; // 필드가 비어있으면 함수 실행을 중단
+    }
+
+    // 출발지와 도착지 주소의 세 번째 단어가 선택된 이용 지역인지 확인
+    var startAddressComponents = document.getElementById('startLocation').value.split(' ');
+    var endAddressComponents = document.getElementById('endLocation').value.split(' ');
+    var regionComponent = region === 'dado' ? '다도면' : '문평면';
+
+    if (startAddressComponents[2] !== regionComponent || endAddressComponents[2] !== regionComponent) {
+        alert("해당 지역을 벗어났습니다.");
+        return; // 주소가 일치하지 않으면 함수 실행을 중단
+    }
+
+    // 현재 날짜와 시간을 구함
+    var now = new Date();
+    var today = now.toISOString().substring(0, 10);
+    var currentTime = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+
+    // 선택된 날짜와 시간이 현재 날짜와 시간보다 이전인지 확인
+    if (selectedDate < today || (selectedDate === today && selectedTime < currentTime)) {
+        alert("현재 시간보다 이전 시간을 선택할 수 없습니다. 시간을 다시 선택해주세요.");
+        return; // 시간이 이전이면 함수 실행을 중단
+    }
+
+    // 예약 정보를 URL 파라미터로 조합
+    var completeURL = './complete.html' +
+        '?region=' + encodeURIComponent(region) +
+        '&startLocation=' + encodeURIComponent(startLocation) +
+        '&endLocation=' + encodeURIComponent(endLocation) +
+        '&date=' + encodeURIComponent(selectedDate) +
+        '&time=' + encodeURIComponent(selectedTime) +
+        '&name=' + encodeURIComponent(name) +
+        '&phone=' + encodeURIComponent(phone);
+
+    // 팝업 창 열기
+    window.open(completeURL, '예약이 완료되었습니다.', 'width=500, height=800, location=no, status=no, scrollvars=yes');
+}
+</script>
+    <!-- 이영채 js key -->
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=41d113ed62453b8428421b6eeda76b42&libraries=services"></script>
+   
+    <!-- <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=0e37ebbf79dc026ab93f431574d744f7&libraries=services"></script> -->
+    <script>
+    var map, geocoder, startMarker, endMarker;
+    var startLatLng, endLatLng; // 출발지와 도착지의 위도와 경도
+    var currentMarker = 'start'; // 현재 설정 중인 마커 추적 ('start' 또는 'end')
+
+    function initMap() {
+        var container = document.getElementById('map');
+        var options = {
+            center: new kakao.maps.LatLng(34.962645, 126.831018), // 기본 위치
+            level: 3
+        };
+
+        map = new kakao.maps.Map(container, options);
+        geocoder = new kakao.maps.services.Geocoder();
+
+        // 초기 마커 생성
+        var defaultLatLng = new kakao.maps.LatLng(34.962645, 126.831018);
+        createMarker(defaultLatLng, true); // 시작 위치 마커
+        createMarker(defaultLatLng, false); // 종료 위치 마커
+
+        kakao.maps.event.addListener(map, 'click', handleMapClick);
+    }
+
+    function createMarker(position, isStart) {
+        var markerImageSrc = isStart ? 'marker_blue_start.PNG' : 'marker_red_end.PNG';
+        var markerImageSize = new kakao.maps.Size(20, 35);
+        var markerImageOptions = { offset: new kakao.maps.Point(12, 35) };
+        var markerImage = new kakao.maps.MarkerImage(markerImageSrc, markerImageSize, markerImageOptions);
+
+        var marker = new kakao.maps.Marker({
+            map: map,
+            position: position,
+            image: markerImage
+        });
+
+        if (isStart) {
+            startMarker = marker;
+        } else {
+            endMarker = marker;
+        }
+    }
+
+    function handleMapClick(mouseEvent) {
+        var latlng = mouseEvent.latLng;
+        setMarker(latlng, currentMarker === 'start');
+        searchAddrFromCoords(latlng, displayAddress);
+    }
+
+    function setMarker(position, isStart) {
+        var targetMarker = isStart ? startMarker : endMarker;
+        if (targetMarker) {
+            targetMarker.setPosition(position);
+        }
+    }
+
+    function searchAddrFromCoords(coords, callback) {
+        var apiURL = 'https://dapi.kakao.com/v2/local/geo/coord2address.json';
+        var queryParams = `?x=${coords.getLng()}&y=${coords.getLat()}`;
+
+        fetch(apiURL + queryParams, {
+            method: 'GET',
+            headers: {
+                // 'Authorization': 'KakaoAK f3f9a175a07e0ee599828e5fe2463035'
+                
+                // 이영채 REST API 키
+                'Authorization': 'KakaoAK e11bdcbd31500f0063091041a9a758c3'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.documents && data.documents.length > 0) {
+                callback(data.documents, kakao.maps.services.Status.OK);
+            } else {
+                console.log("No address data found.");
+                callback(null, kakao.maps.services.Status.ZERO_RESULT);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            callback(null, kakao.maps.services.Status.ERROR);
+        });
+    }
+
+function displayAddress(result, status) {
+    if (status === kakao.maps.services.Status.OK) {
+        var address = result[0].road_address ? result[0].road_address.address_name : result[0].address.address_name;
+        var latLng = new kakao.maps.LatLng(result[0].y, result[0].x);
+        
+        if (currentMarker === 'start') {
+            document.getElementById('startLocation').value = address;
+        } else if (currentMarker === 'end') {
+            document.getElementById('endLocation').value = address;
+        }
+    }
+}
+function getCurrentLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            var lat = position.coords.latitude; // 위도
+            var lng = position.coords.longitude; // 경도
+
+            // 위도와 경도를 출발지 좌표로 설정
+            startLatLng = new kakao.maps.LatLng(lat, lng);
+
+            // 출발지 마커를 설정하고 지도를 해당 위치로 이동
+            setMarker(startLatLng, true);
+            map.setCenter(startLatLng);
+
+            // 좌표를 주소로 변환하여 출발지 텍스트 업데이트
+            searchAddrFromCoords(startLatLng, function (result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    var address = result[0].road_address ? result[0].road_address.address_name : result[0].address.address_name;
+                    document.getElementById('startLocation').value = address;
+                }
+            });
+        }, function (error) {
+            console.error('Error getting current location:', error);
+            handleLocationError(false);
+        });
+    } else {
+        console.error('Geolocation is not supported by this browser.');
+        handleLocationError(true);
+    }
+}
+
+function handleLocationError(browserHasGeolocation) {
+    if (!browserHasGeolocation) {
+        // 사용자가 위치 정보 제공을 거부한 경우 기본 위치로 지도 이동
+        var defaultLatLng = new kakao.maps.LatLng(34.962645, 126.831018);
+        map.setCenter(defaultLatLng);
+    } else {
+        alert('Error: Your browser doesn\'t support geolocation.');
+    }
+}
+
+// 문서 로드 시 지도 초기화
+document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+        getCurrentLocation();
+    });
+
+    // 출발지 및 도착지 입력란 클릭 이벤트 추가
+    document.getElementById('startLocation').addEventListener('click', function() {
+        currentMarker = 'start';
+    });
+
+    document.getElementById('endLocation').addEventListener('click', function() {
+        currentMarker = 'end';
+    });
+
+    </script>
+
+</body>
+</html>
