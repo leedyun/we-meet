@@ -4,8 +4,10 @@
 1. main.html - 메인 페이지
 2. detail.html - DRT 세부 설명 페이지
 3. map.html - 서비스 이용 가능 지역 페이지
-4. reservation.html - 예약하기 페이지
-5. complete.html - 예약 완료 팝업창 페이지
+4. munpyeong.html - 문평면 사진, 운행정보 및 노선 설명 페이지
+5. dado.html - 다도면 사진, 운행정보 및 노선 설명 페이지
+6. reservation.html - 예약하기 페이지
+7. complete.html - 예약 완료 팝업창 페이지
 
 ## 할일 목록
 1. 파일 이름 정리 및 작업한 파일들을 개인 디렉토리 말고 __메인 디렉토리로 가져오기__
