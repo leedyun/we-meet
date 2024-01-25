@@ -2,18 +2,189 @@
 <html>
 <head>
     <title>Chat with Bot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .chat-container {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .message {
+            margin: 10px;
+            display: flex;
+            align-items: flex-start;
+        }
+        .user-icon {
+            width: 30px;
+            height: 30px;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .bot-icon {
+            width: 30px;
+            height: 30px;
+            background-color: #e9ecef;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .user-message {
+            display: inline-block;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            max-width: 70%;
+        }
+        .bot-message {
+            display: inline-block;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            max-width: 70%;
+        }
+        .input-area {
+            display: flex;
+            padding: 10px;
+        }
+        #messageInput {
+            flex-grow: 1;
+            padding: 10px;
+            margin-right: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: gray;
+        }
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+        }
+
+        .navbar-title {
+            float: left;
+            margin: 0;
+            padding: 14px 16px;
+        }
+
+        .navbar-title a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .menu-icon {
+            float: right;
+            padding: 14px 16px;
+            cursor: pointer;
+            color: white;
+            display: none; /* 반응형을 위해 모바일에서만 표시 */
+        }
+
+        .dropdown {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: none;
+    position: absolute;
+    left: 0; /* 왼쪽 정렬 */
+    right: 0; /* 오른쪽 정렬 */
+    background-color: #f9f9f9;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 3; /* 이미지보다 높은 z-index 설정 */
+    overflow: hidden;
+    transition: max-height 0.5s ease-in;
+}
+
+        .dropdown.active {
+    display: block; /* 활성화되었을 때 보이도록 설정 */
+    top : 53px;
+}
+
+        .dropdown li a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+
+        .dropdown li :hover {
+            background-color : lightgrey;
+        }
+        @media screen and (max-width: 768px) {
+                .menu-icon {
+                    display: block;
+                }
+
+                .dropdown {
+                    display: none;
+                }
+            }
+    </style>
+    <script>
+        function toggleMenu() {
+            const dropdown = document.querySelector('.dropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        window.addEventListener('resize', function () {
+            const dropdown = document.querySelector('.dropdown');
+            if (window.innerWidth > 768) {
+                dropdown.style.display = 'none';
+            }   
+        });
+    </script>
 </head>
 <body>
-    <h1>Chat with Bot</h1>
-    <input type="text" id="messageInput" placeholder="Type a message...">
-    <button onclick="sendMessage()">Send</button>
-    <p id="response"></p>
+    <div class="navbar">
+        <h3 class="navbar-title"><a href="../main.html">나주시 DRT</a></h3>
+        <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+        <ul class="dropdown">
+            <li><a href="../detail.html">DRT 알아보기</a></li>
+            <li><a href="../we-meet/map.html">서비스 이용 가능 지역</a></li>
+            <li><a href="../we-meet/reservation.html">DRT 예약하기</a></li>
+            <li><a href="chatbot/chatbot.html">DRT 챗봇</a></li>
+        </ul>
+    </div>
+    <div class="chat-container" id="chatContainer">
+        <!-- Chat messages will be added here -->
+    </div>
+    <div class="input-area">
+        <input type="text" id="messageInput" placeholder="Type a message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
 
     <script>
         var user_id = "unique_user_id";  // 고유 사용자 ID 설정
 
         function sendMessage() {
-            var message = document.getElementById('messageInput').value;
+            var inputField = document.getElementById('messageInput');
+            var message = inputField.value;
+            inputField.value = '';  // Clear the input field after sending a message
+            displayMessage(message, 'user');
+
             fetch('http://127.0.0.1:5000/chat', {
                 method: 'POST',
                 headers: {
@@ -23,11 +194,26 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('response').innerText = data.response;
+                displayMessage(data.response, 'bot');
             })
             .catch((error) => {
                 console.error('Error:', error);
             });
+        }
+
+        function displayMessage(message, sender) {
+            var div = document.createElement('div');
+            div.classList.add('message');
+            if (sender === 'user') {
+                div.innerHTML = '<div class="user-icon">U</div>' +
+                               '<div class="user-message">' + message + '</div>';
+            } else {
+                div.innerHTML = '<div class="bot-icon">B</div>' +
+                               '<div class="bot-message">' + message + '</div>';
+            }
+            document.getElementById('chatContainer').appendChild(div);
+            // Auto scroll to the bottom
+            div.scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </body>
