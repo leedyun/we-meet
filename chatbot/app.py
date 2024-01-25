@@ -67,14 +67,15 @@ def handle_reservation(state, user_input, user_id):
             }
             save_reservation(user_id, reservation_info)  # 여기서 예약 정보를 저장
 
-            response = "예약이 완료되었습니다. 예약 정보: 이름 - {}, 전화번호 - {}, 출발지 - {}, 도착지 - {}, 예약시간 - {}".format(
+            response = "{}님,예약이 완료되었습니다. 예약 정보 : 전화번호 - {}, 출발지 - {}, 도착지 - {}, 예약시간 - {}".format(
                 state["name"], state["phone"], state["departure"], state["destination"], state["datetime"].strftime("%Y-%m-%d %H:%M"))
             state["sub_step"] = "completed"
         else:
             response = "이름과 전화번호 형식이 올바르지 않습니다. 다시 입력해주세요."
 
     else:
-        response = "예약 절차가 완료되었습니다. 다른 도움이 필요하시면 말씀해주세요."
+        response = "예약 절차가 완료되었습니다. 12시 10분까지 {}로 나와주세요. 예상 소요시간은 20분이며, 다른 승객들과 동행할 수 있다는 점 유의해주세요. 다른 도움이 필요하시면 말씀해주세요.".format(
+                state["departure"])
         state["step"] = "welcome"
         state["sub_step"] = None
 
